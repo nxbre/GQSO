@@ -6,23 +6,36 @@ import io.jooby.exception.*;
 public class Soma {
     @Path("/soma/{a}/{b}")
     @GET
-    public String soma(@PathParam String a, @PathParam String b) {
+    public String soma(@PathParam String a, @PathParam String b) 
+    throws BadRequestException {
         try {
 
-            double soma = Double.parseDouble(a) + Double.parseDouble(b);
+            double soma = soma(a,b);
             return String.format("%.2f", soma);
 
-        } catch (NumberFormatException nfe) {
-
-            if(Double.parseDouble(a) < 0){
-                throw new BadRequestException(String.format("Carectere inválido: %s", a));
-            } else if(Double.parseDouble(b) < 0){
-                throw new BadRequestException(String.format("Caractere inválido: %s", b));
-            } 
-
-            throw new BadRequestException(String.format("Caractere inválido: %s e %s.", a, b));
-
-
+        } catch (IllegalArgumentException iae) {
+            throw new BadRequestException(iae.getMessage());
         }
     }
 
+    public double soma (String a, String b) 
+    throws IllegalArgumentException {
+        double soma;
+
+        try {
+            soma = Double.parseDouble(a) + Double.parseDouble(b);
+        } catch (NumberFormatException nfe) {
+            throw new IllegalArgumentException(String.format("Parâmetros inválidos: %s e %s.", a, b));
+        }
+
+        if(Double.parseDouble(a) < 0){
+            throw new IllegalArgumentException(String.format("Parâmetro inválido: %s", a));
+        } else if(Double.parseDouble(b) < 0){
+            throw new IllegalArgumentException(String.format("Parâmetro inválido: %s", b));
+        } 
+
+        return soma;
+    }
+
+
+}
